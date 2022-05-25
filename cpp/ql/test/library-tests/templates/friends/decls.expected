@@ -30,6 +30,8 @@
 | friends.cpp:7:9:7:9 | operator= |
 | friends.cpp:9:17:9:17 | f |
 | friends.cpp:9:17:9:19 | C<TTT>'s friend |
+| friends.cpp:9:17:9:19 | C<char>'s friend |
+| friends.cpp:9:17:9:19 | C<int>'s friend |
 | friends.cpp:9:21:9:26 | (unnamed parameter 0) |
 | friends.cpp:12:17:12:17 | f |
 | friends.cpp:13:17:13:17 | f |
