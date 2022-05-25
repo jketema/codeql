@@ -2705,6 +2705,8 @@ postWithInFlow
 | unaryopexpr.c:11:5:11:5 | VariableAddress [post update] | PostUpdateNode should not be the target of local flow. |
 | unaryopexpr.c:12:7:12:7 | VariableAddress [post update] | PostUpdateNode should not be the target of local flow. |
 | unaryopexpr.c:13:7:13:7 | VariableAddress [post update] | PostUpdateNode should not be the target of local flow. |
+| vacuous_dtor_call.cpp:7:5:7:5 | VariableAddress [post update] | PostUpdateNode should not be the target of local flow. |
+| vacuous_dtor_call.cpp:7:5:7:5 | x [post update] | PostUpdateNode should not be the target of local flow. |
 | void_bug.cpp:5:3:5:11 | VariableAddress [post update] | PostUpdateNode should not be the target of local flow. |
 | whilestmt.c:9:7:9:10 | VariableAddress [post update] | PostUpdateNode should not be the target of local flow. |
 | whilestmt.c:11:5:11:8 | done [post update] | PostUpdateNode should not be the target of local flow. |
