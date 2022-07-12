@@ -1,0 +1,5 @@
+| template_var_initializers.cpp:1:40:1:40 | is_same_v | _Ty1[0],_Ty[0],int[0],long[0],_Ty2[1],_Ty[1],int[1],long[1] | 5 |
+| template_var_initializers.cpp:1:40:1:40 | is_same_v | _Ty[0],_Ty[1] | 0 |
+| template_var_initializers.cpp:1:50:1:50 | is_same_v | _Ty1[0],_Ty[0],int[0],long[0],_Ty2[1],_Ty[1],int[1],long[1] | 5 |
+| template_var_initializers.cpp:2:27:2:27 | is_same_v | _Ty1[0],_Ty[0],int[0],long[0],_Ty2[1],_Ty[1],int[1],long[1] | 5 |
+| template_var_initializers.cpp:2:27:2:45 | is_same_v | _Ty1[0],_Ty[0],int[0],long[0],_Ty2[1],_Ty[1],int[1],long[1] | 5 |
