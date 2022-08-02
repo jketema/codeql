@@ -197,6 +197,7 @@ predicate freedInSameMethod(Resource r, Expr acquire) {
  * object in the function where it's acquired.  This other object
  * may have taken responsibility for freeing the resource.
  */
+pragma[nomagic]
 predicate leakedInSameMethod(Resource r, Expr acquire) {
   unreleasedResource(r, acquire, _, _) and
   exists(Function f |
