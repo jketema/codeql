@@ -65,28 +65,23 @@ where
     call.getEnclosingFunction() instanceof Constructor or
     call.getEnclosingFunction() instanceof Destructor
   ) and
+  exists(Class baseClass |
+    overridingFunction.getDeclaringType().getABaseClass+() = pragma[only_bind_into](baseClass) and
+    call.getEnclosingFunction().getDeclaringType() = pragma[only_bind_into](baseClass)
+  ) and
   (
-    (
-      virtualThisCall(call, overridingFunction) and
-      explanation =
-        "Call to virtual function $@ which is overridden in $@. If you intend to statically call this virtual function, it should be qualified with "
-          + virtFunction.getDeclaringType().toString() + "::."
-    ) and
-    virtFunction = call.getTarget() and
-    overridingFunction.getDeclaringType().getABaseClass+() =
-      call.getEnclosingFunction().getDeclaringType()
+    virtualThisCall(call, overridingFunction) and
+    explanation =
+      "Call to virtual function $@ which is overridden in $@. If you intend to statically call this virtual function, it should be qualified with "
+        + virtFunction.getDeclaringType().toString() + "::." and
+    virtFunction = call.getTarget()
     or
-    exists(VirtualFunction target |
-      thisCall(call) and indirectlyCallsVirtualFunction(call.getTarget(), target, _)
-    |
-      explanation =
-        "Call to function " + call.getTarget().getName() +
-          " that calls virtual function $@ (overridden in $@)." and
-      virtFunction = target and
-      overridingFunction = target.getAnOverridingFunction() and
-      overridingFunction.getDeclaringType().getABaseClass+() =
-        call.getEnclosingFunction().getDeclaringType()
-    )
+    thisCall(call) and
+    indirectlyCallsVirtualFunction(call.getTarget(), virtFunction, _) and
+    explanation =
+      "Call to function " + call.getTarget().getName() +
+        " that calls virtual function $@ (overridden in $@)." and
+    overridingFunction = virtFunction.(VirtualFunction).getAnOverridingFunction()
   )
 select call, explanation, virtFunction, virtFunction.getName(), overridingFunction,
   overridingFunction.getDeclaringType().getName()
