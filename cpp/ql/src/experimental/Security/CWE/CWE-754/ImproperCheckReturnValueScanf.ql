@@ -26,6 +26,7 @@ int posArgumentInFunctionCall(FunctionCall fc) {
 }
 
 /** Holds if a function argument was not initialized but used after the call. */
+bindingset[fc]
 predicate argumentIsNotInitializedAndIsUsed(Variable vt, FunctionCall fc) {
   // Fillable argument was not initialized.
   vt instanceof LocalScopeVariable and
