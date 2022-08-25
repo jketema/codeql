@@ -78,7 +78,7 @@ class SsaDefinition extends ControlFlowNodeBase {
    * `(this, v)`.
    */
   SsaDefinition getAPhiInput(StackVariable v) {
-    this.isPhiNode(v) and
+    this.isPhiNode(pragma[only_bind_into](v)) and
     result.reachesEndOfBB(v, this.(BasicBlock).getAPredecessor())
   }
 
