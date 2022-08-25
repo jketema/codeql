@@ -103,7 +103,7 @@ abstract class StackVariableReachability extends string {
       this.bbEntryReachesLocally(succ, v, node) and
       succSkipsFirstLoopAlwaysTrueUponEntry = false
       or
-      not this.isBarrier(succ.getNode(_), v) and
+      not this.isBarrier(pragma[only_bind_out](succ.getNode(_)), v) and
       this.bbSuccessorEntryReaches(succ, v, node, succSkipsFirstLoopAlwaysTrueUponEntry)
     )
   }
