@@ -13,9 +13,9 @@ predicate closed(Expr e) {
 private class FopenCallMayBeClosedConfiguration extends DataFlow::Configuration {
   FopenCallMayBeClosedConfiguration() { this = "FopenCallMayBeClosedConfiguration" }
 
-  override predicate isSource(DataFlow::Node node) { fopenCall(node.asExpr()) }
+  override predicate isSource(DataFlow::Node node) { fopenCall(node.asConvertedExpr()) }
 
-  override predicate isSink(DataFlow::Node node) { closed(node.asExpr()) }
+  override predicate isSink(DataFlow::Node node) { closed(node.asConvertedExpr()) }
 }
 
 /**
