@@ -72,6 +72,10 @@ Expr asSinkExpr(DataFlow::Node node, int x) {
 class TaintedPathConfiguration extends TaintTracking::Configuration {
   TaintedPathConfiguration() { this = "TaintedPathConfiguration" }
 
+  override predicate isSanitizerIn(DataFlow::Node node) {
+    isSource(node)
+  }
+
   override predicate isSource(DataFlow::Node node) {
     exists(int x |
       isUserInput(asSourceExpr(node, x), _) //and
