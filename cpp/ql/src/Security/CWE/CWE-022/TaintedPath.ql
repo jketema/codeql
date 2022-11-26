@@ -47,12 +47,17 @@ class FileFunction extends FunctionWithWrappers {
   override predicate interestingArg(int arg) { arg = 0 }
 }
 
-Expr asSourceExpr(DataFlow::Node node) {
-  result in [node.asConvertedExpr(), node.asDefiningArgument()]
+Expr asSourceExpr(DataFlow::Node node, int x) {
+  result = node.asConvertedExpr() and
+  x = 1
+  or
+  result = node.asDefiningArgument() and
+  x = 2
 }
 
-Expr asSinkExpr(DataFlow::Node node) {
-  result = node.asConvertedExpr()
+Expr asSinkExpr(DataFlow::Node node, int x) {
+  result = node.asConvertedExpr() and
+  x = 1
   or
   result =
     node.asOperand()
@@ -60,30 +65,64 @@ Expr asSinkExpr(DataFlow::Node node) {
         .getUse()
         .(ReadSideEffectInstruction)
         .getArgumentDef()
-        .getUnconvertedResultExpression()
+        .getUnconvertedResultExpression() and
+  x = 2
 }
 
 class TaintedPathConfiguration extends TaintTracking::Configuration {
   TaintedPathConfiguration() { this = "TaintedPathConfiguration" }
 
-  override predicate isSource(DataFlow::Node node) { isUserInput(asSourceExpr(node), _) }
+  override predicate isSource(DataFlow::Node node) {
+    exists(int x |
+      isUserInput(asSourceExpr(node, x), _) //and
+      // (
+      //   x = 1
+      //   or
+      //   x = 2 and
+      //   not exists(DataFlow::Node n2, Expr e | e = asSourceExpr(n2, 1) |
+      //     isUserInput(e, _) and e = asSourceExpr(node, 2)
+      //   )
+      // )
+    )
+  }
 
   override predicate isSink(DataFlow::Node node) {
     exists(FileFunction fileFunction |
-      fileFunction.outermostWrapperFunctionCall(asSinkExpr(node), _)
+      exists(int x |
+        fileFunction.outermostWrapperFunctionCall(asSinkExpr(node, x), _)// and
+        // (
+        //   x = 1
+        //   or
+        //   x = 2 and
+        //   not exists(DataFlow::Node n2, Expr e | e = asSinkExpr(n2, 1) |
+        //     fileFunction.outermostWrapperFunctionCall(e, _) and e = asSinkExpr(node, 2)
+        //   )
+        // )
+      )
     )
   }
+}
+
+predicate simp(TaintedPathConfiguration cfg,
+  DataFlow::PathNode sourceNode, DataFlow::PathNode sinkNode) {
+exists(DataFlow::PathNode sourceNode2, DataFlow::PathNode sinkNode2, int x, int y, int z, int w|
+  cfg.hasFlowPath(sourceNode2, sinkNode2) and
+  asSinkExpr(sinkNode.getNode(), x) = asSinkExpr(sinkNode2.getNode(), y) and
+  asSourceExpr(sourceNode.getNode(), z) = asSourceExpr(sourceNode2.getNode(), w) and
+  (x = 2 and y = 1 or z = 2 and w = 1)
+  )
 }
 
 from
   FileFunction fileFunction, Expr taintedArg, Expr taintSource, TaintedPathConfiguration cfg,
   DataFlow::PathNode sourceNode, DataFlow::PathNode sinkNode, string taintCause, string callChain
 where
-  taintedArg = asSinkExpr(sinkNode.getNode()) and
+  taintedArg = asSinkExpr(sinkNode.getNode(), _) and
   fileFunction.outermostWrapperFunctionCall(taintedArg, callChain) and
   cfg.hasFlowPath(sourceNode, sinkNode) and
-  taintSource = asSourceExpr(sourceNode.getNode()) and
-  isUserInput(taintSource, taintCause)
+  taintSource = asSourceExpr(sourceNode.getNode(), _) and
+  isUserInput(taintSource, taintCause) and
+  not simp(cfg, sourceNode, sinkNode)
 select taintedArg, sourceNode, sinkNode,
   "This argument to a file access function is derived from $@ and then passed to " + callChain + ".",
   taintSource, "user input (" + taintCause + ")"
