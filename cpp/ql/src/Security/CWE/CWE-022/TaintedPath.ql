@@ -75,6 +75,8 @@ class TaintedPathConfiguration extends TaintTracking::Configuration {
   }
 
   override predicate isSanitizerIn(DataFlow::Node node) { this.isSource(node) }
+
+  override predicate isSanitizerOut(DataFlow::Node node) { this.isSink(node) }
 }
 
 from
