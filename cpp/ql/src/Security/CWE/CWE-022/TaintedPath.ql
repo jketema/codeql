@@ -48,7 +48,9 @@ class FileFunction extends FunctionWithWrappers {
 }
 
 Expr asSourceExpr(DataFlow::Node node) {
-  result in [node.asConvertedExpr(), node.asDefiningArgument()]
+  result = node.asConvertedExpr()
+  or
+  result = node.asDefiningArgument()
 }
 
 Expr asSinkExpr(DataFlow::Node node) {
@@ -77,13 +79,29 @@ class TaintedPathConfiguration extends TaintTracking::Configuration {
   override predicate isSanitizerIn(DataFlow::Node node) { this.isSource(node) }
 }
 
+predicate hasFlowPath(DataFlow::PathNode sourceNode, DataFlow::PathNode sinkNode) {
+  exists(TaintedPathConfiguration cfg |
+    cfg.hasFlowPath(sourceNode, sinkNode) and
+    not exists(DataFlow::Node sourceNode2, DataFlow::Node sinkNode2 |
+      cfg.hasFlow(sourceNode2, sinkNode2) and
+      asSourceExpr(sourceNode.getNode()) = asSourceExpr(sourceNode2) and
+      asSinkExpr(sinkNode.getNode()) = asSinkExpr(sinkNode2) and
+      (
+        not exists(sourceNode.getNode().asConvertedExpr()) and exists(sourceNode2.asConvertedExpr())
+        or
+        not exists(sinkNode.getNode().asConvertedExpr()) and exists(sinkNode2.asConvertedExpr())
+      )
+    )
+  )
+}
+
 from
-  FileFunction fileFunction, Expr taintedArg, Expr taintSource, TaintedPathConfiguration cfg,
-  DataFlow::PathNode sourceNode, DataFlow::PathNode sinkNode, string taintCause, string callChain
+  FileFunction fileFunction, Expr taintedArg, Expr taintSource, DataFlow::PathNode sourceNode,
+  DataFlow::PathNode sinkNode, string taintCause, string callChain
 where
   taintedArg = asSinkExpr(sinkNode.getNode()) and
   fileFunction.outermostWrapperFunctionCall(taintedArg, callChain) and
-  cfg.hasFlowPath(sourceNode, sinkNode) and
+  hasFlowPath(sourceNode, sinkNode) and
   taintSource = asSourceExpr(sourceNode.getNode()) and
   isUserInput(taintSource, taintCause)
 select taintedArg, sourceNode, sinkNode,
