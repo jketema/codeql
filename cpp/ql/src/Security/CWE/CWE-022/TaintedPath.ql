@@ -77,31 +77,28 @@ class TaintedPathConfiguration extends TaintTracking::Configuration {
   }
 
   override predicate isSanitizerIn(DataFlow::Node node) { this.isSource(node) }
-}
 
-predicate hasFlowPath(DataFlow::PathNode sourceNode, DataFlow::PathNode sinkNode) {
-  exists(TaintedPathConfiguration cfg |
-    cfg.hasFlowPath(sourceNode, sinkNode) and
-    not exists(DataFlow::Node sourceNode2, DataFlow::Node sinkNode2 |
-      cfg.hasFlow(sourceNode2, sinkNode2) and
-      asSourceExpr(sourceNode.getNode()) = asSourceExpr(sourceNode2) and
-      asSinkExpr(sinkNode.getNode()) = asSinkExpr(sinkNode2) and
-      (
-        not exists(sourceNode.getNode().asConvertedExpr()) and exists(sourceNode2.asConvertedExpr())
-        or
-        not exists(sinkNode.getNode().asConvertedExpr()) and exists(sinkNode2.asConvertedExpr())
-      )
+  predicate hasFilteredFlowPath(DataFlow::PathNode source, DataFlow::PathNode sink) {
+    this.hasFlowPath(source, sink) and
+    not exists(DataFlow::PathNode source2, DataFlow::PathNode sink2 |
+      this.hasFlowPath(source2, sink2) and
+      asSourceExpr(source.getNode()) = asSourceExpr(source2.getNode()) and
+      asSinkExpr(sink.getNode()) = asSinkExpr(sink2.getNode())
+    |
+      not exists(source.getNode().asConvertedExpr()) and exists(source2.getNode().asConvertedExpr())
+      or
+      not exists(sink.getNode().asConvertedExpr()) and exists(sink2.getNode().asConvertedExpr())
     )
-  )
+  }
 }
 
 from
-  FileFunction fileFunction, Expr taintedArg, Expr taintSource, DataFlow::PathNode sourceNode,
-  DataFlow::PathNode sinkNode, string taintCause, string callChain
+  FileFunction fileFunction, Expr taintedArg, Expr taintSource, TaintedPathConfiguration cfg,
+  DataFlow::PathNode sourceNode, DataFlow::PathNode sinkNode, string taintCause, string callChain
 where
   taintedArg = asSinkExpr(sinkNode.getNode()) and
   fileFunction.outermostWrapperFunctionCall(taintedArg, callChain) and
-  hasFlowPath(sourceNode, sinkNode) and
+  cfg.hasFilteredFlowPath(sourceNode, sinkNode) and
   taintSource = asSourceExpr(sourceNode.getNode()) and
   isUserInput(taintSource, taintCause)
 select taintedArg, sourceNode, sinkNode,
