@@ -116,6 +116,7 @@ class TaintedPathConfiguration extends TaintTracking::Configuration {
     |
       not exists(source.getNode().asConvertedExpr()) and exists(source2.getNode().asConvertedExpr())
       or
+      source = sink and
       not exists(sink.getNode().asConvertedExpr()) and exists(sink2.getNode().asConvertedExpr())
     )
   }
