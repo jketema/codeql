@@ -66,11 +66,11 @@ Expr asSinkExpr(DataFlow::Node node) {
 }
 
 /**
- * A variable that has any kind of upper-bound check anywhere in the program.  This is
- * biased towards being inclusive and being a coarse overapproximation because there are
- * a lot of valid ways of doing an upper bounds checks if we don't consider where it
- * occurs, for example:
- * ```
+ * Holds for a variable that has any kind of upper-bound check anywhere in the program.
+ * This is biased towards being inclusive and being a coarse overapproximation because
+ * there are a lot of valid ways of doing an upper bounds checks if we don't consider
+ * where it occurs, for example:
+ * ```cpp
  *   if (x < 10) { sink(x); }
  *
  *   if (10 > y) { sink(y); }
