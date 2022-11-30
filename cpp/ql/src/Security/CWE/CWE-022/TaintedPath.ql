@@ -65,6 +65,29 @@ Expr asSinkExpr(DataFlow::Node node) {
         .getUnconvertedResultExpression()
 }
 
+/**
+ * A variable that has any kind of upper-bound check anywhere in the program.  This is
+ * biased towards being inclusive and being a coarse overapproximation because there are
+ * a lot of valid ways of doing an upper bounds checks if we don't consider where it
+ * occurs, for example:
+ * ```
+ *   if (x < 10) { sink(x); }
+ *
+ *   if (10 > y) { sink(y); }
+ *
+ *   if (z > 10) { z = 10; }
+ *   sink(z);
+ * ```
+ */
+predicate hasUpperBoundsCheck(Variable var) {
+  exists(RelationalOperation oper, VariableAccess access |
+    oper.getAnOperand() = access and
+    access.getTarget() = var and
+    // Comparing to 0 is not an upper bound check
+    not oper.getAnOperand().getValue() = "0"
+  )
+}
+
 class TaintedPathConfiguration extends TaintTracking::Configuration {
   TaintedPathConfiguration() { this = "TaintedPathConfiguration" }
 
@@ -80,6 +103,8 @@ class TaintedPathConfiguration extends TaintTracking::Configuration {
 
   override predicate isSanitizer(DataFlow::Node node) {
     node.asExpr().(Call).getTarget().getUnspecifiedType() instanceof ArithmeticType
+    or
+    hasUpperBoundsCheck(node.asExpr().(VariableAccess).getTarget())
   }
 
   predicate hasFilteredFlowPath(DataFlow::PathNode source, DataFlow::PathNode sink) {
