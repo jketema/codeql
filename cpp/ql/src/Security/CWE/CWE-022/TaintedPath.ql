@@ -102,8 +102,8 @@ class TaintedPathConfiguration extends TaintTracking::Configuration {
   override predicate isSanitizerIn(DataFlow::Node node) { this.isSource(node) }
 
   override predicate isSanitizer(DataFlow::Node node) {
-    node.asExpr().(Call).getTarget().getUnspecifiedType() instanceof ArithmeticType
-    or
+    // node.asExpr().(Call).getTarget().getUnspecifiedType() instanceof ArithmeticType
+    // or
     //exists(VariableAccess va | va = node.asExpr() | va.isModified() and hasUpperBoundsCheck(va.getTarget()))
     exists(Variable checkedVar, LoadInstruction load|
       load.getSourceAddress().(VariableAddressInstruction).getAstVariable() = checkedVar and
