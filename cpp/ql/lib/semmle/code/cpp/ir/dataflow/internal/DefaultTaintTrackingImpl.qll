@@ -156,7 +156,7 @@ private predicate writesVariable(StoreInstruction store, Variable var) {
 // variable _access_ is guarded by an upper-bound check. We probably don't want
 // to do this right away since it could expose a lot of FPs that were
 // previously suppressed by this predicate by coincidence.
-private predicate hasUpperBoundsCheck(Variable var) {
+predicate hasUpperBoundsCheck(Variable var) {
   exists(RelationalOperation oper, VariableAccess access |
     oper.getAnOperand() = access and
     access.getTarget() = var and

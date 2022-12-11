@@ -19,6 +19,7 @@ import semmle.code.cpp.security.FunctionWithWrappers
 import semmle.code.cpp.security.FlowSources
 import semmle.code.cpp.ir.IR
 import semmle.code.cpp.ir.dataflow.TaintTracking
+import semmle.code.cpp.ir.dataflow.internal.DefaultTaintTrackingImpl
 import DataFlow::PathGraph
 
 /**
@@ -55,29 +56,6 @@ Expr asSinkExpr(DataFlow::Node node) {
         .(ReadSideEffectInstruction)
         .getArgumentDef()
         .getUnconvertedResultExpression()
-}
-
-/**
- * Holds for a variable that has any kind of upper-bound check anywhere in the program.
- * This is biased towards being inclusive and being a coarse overapproximation because
- * there are a lot of valid ways of doing an upper bounds checks if we don't consider
- * where it occurs, for example:
- * ```cpp
- *   if (x < 10) { sink(x); }
- *
- *   if (10 > y) { sink(y); }
- *
- *   if (z > 10) { z = 10; }
- *   sink(z);
- * ```
- */
-predicate hasUpperBoundsCheck(Variable var) {
-  exists(RelationalOperation oper, VariableAccess access |
-    oper.getAnOperand() = access and
-    access.getTarget() = var and
-    // Comparing to 0 is not an upper bound check
-    not oper.getAnOperand().getValue() = "0"
-  )
 }
 
 class TaintedPathConfiguration extends TaintTracking::Configuration {

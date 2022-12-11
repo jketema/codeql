@@ -15,6 +15,7 @@
 
 import cpp
 import semmle.code.cpp.ir.dataflow.TaintTracking
+import semmle.code.cpp.ir.dataflow.internal.DefaultTaintTrackingImpl
 import semmle.code.cpp.controlflow.IRGuards
 import semmle.code.cpp.security.FlowSources
 import DataFlow::PathGraph
@@ -50,15 +51,6 @@ predicate sourceSized(FunctionCall fc, Expr src) {
 
 predicate readsVariable(LoadInstruction load, Variable var) {
   load.getSourceAddress().(VariableAddressInstruction).getAstVariable() = var
-}
-
-predicate hasUpperBoundsCheck(Variable var) {
-  exists(RelationalOperation oper, VariableAccess access |
-    oper.getAnOperand() = access and
-    access.getTarget() = var and
-    // Comparing to 0 is not an upper bound check
-    not oper.getAnOperand().getValue() = "0"
-  )
 }
 
 predicate nodeIsBarrierEqualityCandidate(DataFlow::Node node, Operand access, Variable checkedVar) {
