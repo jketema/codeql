@@ -1,8 +1,6 @@
 private import cpp
-private import semmle.code.cpp.Print
 private import semmle.code.cpp.ir.implementation.IRType
 private import semmle.code.cpp.ir.implementation.raw.internal.IRConstruction::Raw as Raw
-
 private int getPointerSize() { result = max(any(NullPointerType t).getSize()) }
 
 /**
@@ -543,7 +541,7 @@ CppType getCanonicalOpaqueType(Type tag, int byteSize) {
  */
 string getOpaqueTagIdentityString(Type tag) {
   hasOpaqueType(tag, _) and
-  result = getTypeIdentityString(tag)
+  result = tag.toString()
 }
 
 module LanguageTypeConsistency {
