@@ -100,11 +100,13 @@ predicate hasSize(HeuristicAllocationExpr alloc, DataFlow::Node n, string state)
  * Finally, the range-analysis library will find a load from (or store to) an address that
  * is non-strictly upper-bounded by `end` (which in this case is `*p`).
  */
-class AllocToInvalidPointerConf extends ProductFlow::Configuration {
-  AllocToInvalidPointerConf() { this = "AllocToInvalidPointerConf" }
+module AllocToInvalidPointerConfig implements ProductFlow::StateConfigSig {
+  class FlowState1 = string;
 
-  override predicate isSourcePair(
-    DataFlow::Node source1, string state1, DataFlow::Node source2, string state2
+  class FlowState2 = string;
+
+  predicate isSourcePair(
+    DataFlow::Node source1, FlowState1 state1, DataFlow::Node source2, FlowState2 state2
   ) {
     // In the case of an allocation like
     // ```cpp
@@ -116,9 +118,8 @@ class AllocToInvalidPointerConf extends ProductFlow::Configuration {
     hasSize(source1.asConvertedExpr(), source2, state2)
   }
 
-  override predicate isSinkPair(
-    DataFlow::Node sink1, DataFlow::FlowState state1, DataFlow::Node sink2,
-    DataFlow::FlowState state2
+  predicate isSinkPair(
+    DataFlow::Node sink1, FlowState1 state1, DataFlow::Node sink2, FlowState2 state2
   ) {
     state1 = "" and
     // We check that the delta computed by the range analysis matches the
@@ -129,12 +130,30 @@ class AllocToInvalidPointerConf extends ProductFlow::Configuration {
     )
   }
 
-  override predicate isBarrierOut2(DataFlow::Node node) {
+  predicate isBarrier1(DataFlow::Node node, FlowState1 state) { none() }
+
+  predicate isBarrier2(DataFlow::Node node, FlowState2 state) { none() }
+
+  predicate isBarrierIn1(DataFlow::Node node) { isSourcePair(node, _, _, _) }
+
+  predicate isBarrierOut2(DataFlow::Node node) {
     node = any(DataFlow::SsaPhiNode phi).getAnInput(true)
   }
 
-  override predicate isBarrierIn1(DataFlow::Node node) { this.isSourcePair(node, _, _, _) }
+  predicate isAdditionalFlowStep1(
+    DataFlow::Node node1, FlowState1 state1, DataFlow::Node node2, FlowState1 state2
+  ) {
+    none()
+  }
+
+  predicate isAdditionalFlowStep2(
+    DataFlow::Node node1, FlowState2 state1, DataFlow::Node node2, FlowState2 state2
+  ) {
+    none()
+  }
 }
+
+module AllocToInvalidPointerFlow = ProductFlow::MakeWithState<AllocToInvalidPointerConfig>;
 
 pragma[nomagic]
 predicate pointerAddInstructionHasOperands(
@@ -222,9 +241,9 @@ module InvalidPointerToDerefFlow = DataFlow::Make<InvalidPointerToDerefConfig>;
 predicate invalidPointerToDerefSource(
   PointerArithmeticInstruction pai, DataFlow::Node source, int delta
 ) {
-  exists(ProductFlow::Configuration conf, DataFlow::PathNode p, DataFlow::Node sink1 |
+  exists(AllocToInvalidPointerFlow::PathNode1 p, DataFlow::Node sink1 |
     p.getNode() = sink1 and
-    conf.hasFlowPath(_, _, p, _) and
+    AllocToInvalidPointerFlow::hasFlowPath(_, _, p, _) and
     isSinkImpl(pai, sink1, _, _) and
     bounded(source.asInstruction(), pai, delta) and
     delta >= 0
@@ -233,7 +252,7 @@ predicate invalidPointerToDerefSource(
 
 newtype TMergedPathNode =
   // The path nodes computed by the first projection of `AllocToInvalidPointerConf`
-  TPathNode1(DataFlow::PathNode p) or
+  TPathNode1(AllocToInvalidPointerFlow::PathNode1 p) or
   // The path nodes computed by `InvalidPointerToDerefConf`
   TPathNode3(InvalidPointerToDerefFlow::PathNode p) or
   // The read/write that uses the invalid pointer identified by `InvalidPointerToDerefConf`.
@@ -249,7 +268,7 @@ newtype TMergedPathNode =
 class MergedPathNode extends TMergedPathNode {
   string toString() { none() }
 
-  final DataFlow::PathNode asPathNode1() { this = TPathNode1(result) }
+  final AllocToInvalidPointerFlow::PathNode1 asPathNode1() { this = TPathNode1(result) }
 
   final InvalidPointerToDerefFlow::PathNode asPathNode3() { this = TPathNode3(result) }
 
@@ -264,7 +283,7 @@ class MergedPathNode extends TMergedPathNode {
 
 class PathNode1 extends MergedPathNode, TPathNode1 {
   override string toString() {
-    exists(DataFlow::PathNode p |
+    exists(AllocToInvalidPointerFlow::PathNode1 p |
       this = TPathNode1(p) and
       result = p.toString()
     )
@@ -324,7 +343,8 @@ query predicate edges(MergedPathNode node1, MergedPathNode node2) {
  * of `InvalidPointerToDerefConf`, and they are connected through `pai`.
  */
 predicate joinOn1(
-  PointerArithmeticInstruction pai, DataFlow::PathNode p1, InvalidPointerToDerefFlow::PathNode p2
+  PointerArithmeticInstruction pai, AllocToInvalidPointerFlow::PathNode1 p1,
+  InvalidPointerToDerefFlow::PathNode p2
 ) {
   isSinkImpl(pai, p1.getNode(), _, _) and
   invalidPointerToDerefSource(pai, p2.getNode(), _)
@@ -343,11 +363,8 @@ predicate hasFlowPath(
   MergedPathNode source1, MergedPathNode sink, InvalidPointerToDerefFlow::PathNode source3,
   PointerArithmeticInstruction pai, string operation
 ) {
-  exists(
-    AllocToInvalidPointerConf conf1, InvalidPointerToDerefFlow::PathNode sink3,
-    DataFlow::PathNode sink1
-  |
-    conf1.hasFlowPath(source1.asPathNode1(), _, sink1, _) and
+  exists(InvalidPointerToDerefFlow::PathNode sink3, AllocToInvalidPointerFlow::PathNode1 sink1 |
+    AllocToInvalidPointerFlow::hasFlowPath(source1.asPathNode1(), _, sink1, _) and
     joinOn1(pai, sink1, source3) and
     InvalidPointerToDerefFlow::hasFlowPath(source3, sink3) and
     joinOn2(sink3, sink.asSinkNode(), operation)
