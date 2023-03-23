@@ -21,7 +21,6 @@ import experimental.semmle.code.cpp.semantic.analysis.RangeAnalysis
 import experimental.semmle.code.cpp.semantic.SemanticBound
 import experimental.semmle.code.cpp.semantic.SemanticExprSpecific
 import StringSizeFlow::PathGraph1
-import codeql.util.Unit
 
 pragma[nomagic]
 Instruction getABoundIn(SemBound b, IRFunction func) {
@@ -74,7 +73,7 @@ predicate isSinkPairImpl(
 }
 
 module StringSizeConfig implements ProductFlow::StateConfigSig {
-  class FlowState1 = Unit;
+  class FlowState1 = DataFlow::FlowState;
 
   class FlowState2 = int;
 
@@ -87,14 +86,14 @@ module StringSizeConfig implements ProductFlow::StateConfigSig {
     // ```
     // we use `state2` to remember that there was an offset (in this case an offset of `1`) added
     // to the size of the allocation. This state is then checked in `isSinkPair`.
-    exists(state1) and
+    state1 instanceof DataFlow::FlowStateEmpty and
     hasSize(bufSource.asConvertedExpr(), sizeSource, state2)
   }
 
   predicate isSinkPair(
     DataFlow::Node bufSink, FlowState1 state1, DataFlow::Node sizeSink, FlowState2 state2
   ) {
-    exists(state1) and
+    state1 instanceof DataFlow::FlowStateEmpty and
     state2 = [-32 .. 32] and // An arbitrary bound because we need to bound `state2`
     exists(int delta |
       isSinkPairImpl(_, bufSink, sizeSink, delta, _) and

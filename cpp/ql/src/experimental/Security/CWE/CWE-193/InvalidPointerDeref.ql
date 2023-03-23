@@ -21,7 +21,6 @@ import experimental.semmle.code.cpp.semantic.analysis.RangeAnalysis
 import experimental.semmle.code.cpp.semantic.SemanticBound
 import experimental.semmle.code.cpp.semantic.SemanticExprSpecific
 import semmle.code.cpp.ir.IR
-import codeql.util.Unit
 
 pragma[nomagic]
 Instruction getABoundIn(SemBound b, IRFunction func) {
@@ -36,7 +35,7 @@ pragma[nomagic]
 predicate bounded(Instruction i, Instruction b, int delta) {
   exists(SemBound bound, IRFunction func |
     semBounded(getSemanticExpr(i), bound, delta, true, _) and
-    b = getABoundIn(bound, func) and
+    pragma[only_bind_into](b) = getABoundIn(pragma[only_bind_into](bound), pragma[only_bind_into](func)) and
     i.getEnclosingIRFunction() = func
   )
 }
@@ -102,7 +101,7 @@ predicate hasSize(HeuristicAllocationExpr alloc, DataFlow::Node n, int state) {
  * is non-strictly upper-bounded by `end` (which in this case is `*p`).
  */
 module AllocToInvalidPointerConfig implements ProductFlow::StateConfigSig {
-  class FlowState1 = Unit;
+  class FlowState1 = DataFlow::FlowState;
 
   class FlowState2 = int;
 
@@ -115,14 +114,14 @@ module AllocToInvalidPointerConfig implements ProductFlow::StateConfigSig {
     // ```
     // we use `state2` to remember that there was an offset (in this case an offset of `1`) added
     // to the size of the allocation. This state is then checked in `isSinkPair`.
-    exists(state1) and
+    state1 instanceof DataFlow::FlowStateEmpty and
     hasSize(source1.asConvertedExpr(), source2, state2)
   }
 
   predicate isSinkPair(
     DataFlow::Node sink1, FlowState1 state1, DataFlow::Node sink2, FlowState2 state2
   ) {
-    exists(state1) and
+    state1 instanceof DataFlow::FlowStateEmpty and
     // We check that the delta computed by the range analysis matches the
     // state value that we set in `isSourcePair`.
     exists(int delta |
