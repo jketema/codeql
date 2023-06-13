@@ -5,7 +5,7 @@
  * @kind path-problem
  * @problem.severity error
  * @security-severity 9.3
- * @precision high
+ * @precision medium
  * @id cpp/constant-array-overflow
  * @tags reliability
  *       security
