@@ -7,9 +7,11 @@
  * @problem.severity error
  * @precision high
  * @id cpp/redundant-null-check-simple
+ * @security-severity 9.3
  * @tags reliability
  *       correctness
  *       external/cwe/cwe-476
+ *       security
  */
 
 import cpp

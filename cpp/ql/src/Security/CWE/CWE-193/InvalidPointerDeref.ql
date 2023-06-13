@@ -4,11 +4,11 @@
  *              and may lead to security vulnerabilities.
  * @kind path-problem
  * @problem.severity error
+ * @security-severity 9.3
  * @precision high
  * @id cpp/invalid-pointer-deref
  * @tags reliability
  *       security
- *       experimental
  *       external/cwe/cwe-119
  *       external/cwe/cwe-125
  *       external/cwe/cwe-193

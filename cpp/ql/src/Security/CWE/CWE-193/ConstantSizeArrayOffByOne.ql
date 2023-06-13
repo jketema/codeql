@@ -4,10 +4,11 @@
  *              and may lead to security vulnerabilities
  * @kind path-problem
  * @problem.severity error
+ * @security-severity 9.3
+ * @precision high
  * @id cpp/constant-array-overflow
  * @tags reliability
  *       security
- *       experimental
  */
 
 import semmle.code.cpp.rangeanalysis.new.internal.semantic.analysis.RangeAnalysis
