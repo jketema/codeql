@@ -4,4 +4,26 @@ WARNING: Module DataFlow has been deprecated and may be removed in future (taint
 WARNING: Module DataFlow has been deprecated and may be removed in future (taint.ql:68,25-33)
 WARNING: Module TaintTracking has been deprecated and may be removed in future (taint.ql:73,20-33)
 testFailures
+| map.cpp:168:7:168:27 | ... = ... | Unexpected result: ir= |
+| map.cpp:168:7:168:27 | ... = ... indirection | Unexpected result: ir= |
+| map.cpp:168:31:168:57 | // $ ast ir=168:7 ir=168:20 | Missing result:ir=168:7 |
+| map.cpp:168:31:168:57 | // $ ast ir=168:7 ir=168:20 | Missing result:ir=168:20 |
+| map.cpp:170:7:170:30 | ... = ... | Unexpected result: ir= |
+| map.cpp:170:7:170:30 | ... = ... indirection | Unexpected result: ir= |
+| map.cpp:170:34:170:60 | // $ ast ir=170:7 ir=170:23 | Missing result:ir=170:7 |
+| map.cpp:170:34:170:60 | // $ ast ir=170:7 ir=170:23 | Missing result:ir=170:23 |
+| map.cpp:320:7:320:27 | ... = ... | Unexpected result: ir= |
+| map.cpp:320:7:320:27 | ... = ... indirection | Unexpected result: ir= |
+| map.cpp:320:31:320:57 | // $ ast ir=320:7 ir=320:20 | Missing result:ir=320:7 |
+| map.cpp:320:31:320:57 | // $ ast ir=320:7 ir=320:20 | Missing result:ir=320:20 |
+| map.cpp:322:7:322:30 | ... = ... | Unexpected result: ir= |
+| map.cpp:322:7:322:30 | ... = ... indirection | Unexpected result: ir= |
+| map.cpp:322:34:322:60 | // $ ast ir=322:7 ir=322:23 | Missing result:ir=322:7 |
+| map.cpp:322:34:322:60 | // $ ast ir=322:7 ir=322:23 | Missing result:ir=322:23 |
+| taint.cpp:16:8:16:14 | source1 | Unexpected result: ir= |
+| taint.cpp:16:18:16:43 | // $ ast ir=12:13 ir=12:22 | Missing result:ir=12:13 |
+| taint.cpp:16:18:16:43 | // $ ast ir=12:13 ir=12:22 | Missing result:ir=12:22 |
+| taint.cpp:17:8:17:16 | ++ ... | Unexpected result: ir= |
+| taint.cpp:17:20:17:45 | // $ ast ir=12:13 ir=12:22 | Missing result:ir=12:13 |
+| taint.cpp:17:20:17:45 | // $ ast ir=12:13 ir=12:22 | Missing result:ir=12:22 |
 failures
