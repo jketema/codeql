@@ -4,8 +4,6 @@ groupNumber
 | regexp.cpp:57:20:57:27 | (a\|b\|cd) | 1 |
 | regexp.cpp:61:21:61:24 | (a+) | 1 |
 term
-| file://:0:0:0:0 | abc2 | RegExpConstant,RegExpNormalChar |
-| file://:0:0:0:0 | xabc3x | RegExpConstant,RegExpNormalChar |
 | regexp.cpp:18:19:18:21 | abc | RegExpConstant,RegExpNormalChar |
 | regexp.cpp:21:20:21:20 | a | RegExpConstant,RegExpNormalChar |
 | regexp.cpp:21:20:21:21 | a* | RegExpStar |
@@ -241,9 +239,9 @@ term
 | regexp.cpp:122:30:122:31 | \\n | RegExpConstant,RegExpEscape |
 | regexp.cpp:122:32:122:32 | c | RegExpConstant,RegExpNormalChar |
 | regexp.cpp:127:29:127:32 | abc1 | RegExpConstant,RegExpNormalChar |
+| regexp.cpp:128:35:128:38 | abc2 | RegExpConstant,RegExpNormalChar |
+| regexp.cpp:129:25:129:30 | xabc3x | RegExpConstant,RegExpNormalChar |
 regExpNormalCharValue
-| file://:0:0:0:0 | abc2 | abc2 |
-| file://:0:0:0:0 | xabc3x | xabc3x |
 | regexp.cpp:18:19:18:21 | abc | abc |
 | regexp.cpp:21:20:21:20 | a | a |
 | regexp.cpp:21:22:21:22 | b | b |
@@ -368,3 +366,5 @@ regExpNormalCharValue
 | regexp.cpp:122:30:122:31 | \\n | \n |
 | regexp.cpp:122:32:122:32 | c | c |
 | regexp.cpp:127:29:127:32 | abc1 | abc1 |
+| regexp.cpp:128:35:128:38 | abc2 | abc2 |
+| regexp.cpp:129:25:129:30 | xabc3x | xabc3x |
