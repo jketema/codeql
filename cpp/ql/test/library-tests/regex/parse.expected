@@ -637,3 +637,9 @@ regexp.cpp:
 #  122| [RegExpConstant, RegExpEscape] \n
 
 #  122| [RegExpConstant, RegExpNormalChar] c
+
+#  127| [RegExpConstant, RegExpNormalChar] abc1
+
+#  128| [RegExpConstant, RegExpNormalChar] abc2
+
+#  129| [RegExpConstant, RegExpNormalChar] xabc3x

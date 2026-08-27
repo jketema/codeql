@@ -238,6 +238,9 @@ term
 | regexp.cpp:122:29:122:32 | a\\nc | RegExpSequence |
 | regexp.cpp:122:30:122:31 | \\n | RegExpConstant,RegExpEscape |
 | regexp.cpp:122:32:122:32 | c | RegExpConstant,RegExpNormalChar |
+| regexp.cpp:127:29:127:32 | abc1 | RegExpConstant,RegExpNormalChar |
+| regexp.cpp:128:35:128:38 | abc2 | RegExpConstant,RegExpNormalChar |
+| regexp.cpp:129:25:129:30 | xabc3x | RegExpConstant,RegExpNormalChar |
 regExpNormalCharValue
 | regexp.cpp:18:19:18:21 | abc | abc |
 | regexp.cpp:21:20:21:20 | a | a |
@@ -362,3 +365,6 @@ regExpNormalCharValue
 | regexp.cpp:122:29:122:29 | a | a |
 | regexp.cpp:122:30:122:31 | \\n | \n |
 | regexp.cpp:122:32:122:32 | c | c |
+| regexp.cpp:127:29:127:32 | abc1 | abc1 |
+| regexp.cpp:128:35:128:38 | abc2 | abc2 |
+| regexp.cpp:129:25:129:30 | xabc3x | xabc3x |
