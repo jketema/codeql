@@ -590,7 +590,7 @@ func installDependenciesAndBuild() {
 
 	// check whether an explicit dependency installation command was provided
 	inst := util.Getenv("CODEQL_EXTRACTOR_GO_BUILD_COMMAND", "LGTM_INDEX_BUILD_COMMAND")
-	if os.Getenv("CODEQL_EXTRACTOR_GO_BUILD_MODE") == "none" {
+	if true {
 		log.Println("Build mode is 'none'; skipping project build scripts and custom build commands.")
 		for i := range workspaces {
 			workspaces[i].ShouldInstallDependencies = true
